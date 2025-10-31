@@ -28,23 +28,23 @@ jobs:
           app_id: ${{ secrets.WIKI_DIAGRAM_APP_ID }}
           private_key: ${{ secrets.WIKI_DIAGRAM_APP_PRIVATE_KEY }}
 
-      - name: 📚 Checkout homelab-wiki repository
+      - name: 📚 Checkout homelabwiki repository
         uses: actions/checkout@v4
         with:
           repository: henryhall897/homelabwiki
           ref: main
           token: ${{ steps.app-token.outputs.token }}
-          path: homelab-wiki
+          path: homelabwiki
 
-      - name: 🖼️ Copy generated diagrams to homelab-wiki
+      - name: 🖼️ Copy generated diagrams to homelabwiki
         run: |
-          mkdir -p homelab-wiki/assets/diagrams
+          mkdir -p homelabwiki/assets/diagrams
           echo "Copying generated PNG diagrams..."
-          cp -v assets/diagrams/gen/png/*.png homelab-wiki/assets/diagrams/ || echo "No PNG diagrams found"
+          cp -v assets/diagrams/gen/png/*.png homelabwiki/assets/diagrams/ || echo "No PNG diagrams found"
 
-      - name: 💾 Commit and push changes to homelab-wiki
+      - name: 💾 Commit and push changes to homelabwiki
         run: |
-          cd homelab-wiki
+          cd homelabwiki
           git config user.name "Wiki Diagram Publisher"
           git config user.email "actions@github.com"
           git add assets/diagrams/
