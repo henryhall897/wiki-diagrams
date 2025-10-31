@@ -1,4 +1,4 @@
-name: Publish Diagrams to Wiki
+name: Push Diagrams to homelabwiki
 
 on:
   push:
