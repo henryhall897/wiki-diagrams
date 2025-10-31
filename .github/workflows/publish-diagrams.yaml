@@ -1,0 +1,50 @@
+name: Publish Diagrams to Wiki
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'assets/diagrams/**'
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout wiki-diagrams
+        uses: actions/checkout@v4
+        with:
+          repository: henryhall897/wiki-diagrams
+          ref: main
+
+      - name: Generate GitHub App token
+        id: app-token
+        uses: tibdex/github-app-token@v2
+        with:
+          app_id: ${{ secrets.WIKI_DIAGRAM_APP_ID }}
+          private_key: ${{ secrets.WIKI_DIAGRAM_APP_PRIVATE_KEY }}
+
+      - name: Clone homelab-wiki repo
+        uses: actions/checkout@v4
+        with:
+          repository: henryhall897/homelab-wiki
+          ref: main
+          token: ${{ steps.app-token.outputs.token }}
+          path: homelab-wiki
+
+      - name: Copy diagrams to homelab-wiki assets folder
+        run: |
+          mkdir -p homelab-wiki/assets/diagrams
+          cp -v assets/diagrams/*.png homelab-wiki/assets/diagrams/
+
+      - name: Commit and push changes to homelab-wiki
+        run: |
+          cd homelab-wiki
+          git config user.name "Wiki Diagram Publisher"
+          git config user.email "actions@github.com"
+          git add assets/diagrams/
+          git commit -m "Update diagrams from wiki-diagrams" || echo "No changes to commit"
+          git push origin main
