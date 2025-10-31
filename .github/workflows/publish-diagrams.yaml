@@ -13,21 +13,22 @@ permissions:
 jobs:
   publish:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout wiki-diagrams
+      - name: 🧾 Checkout wiki-diagrams repository
         uses: actions/checkout@v4
         with:
           repository: henryhall897/wiki-diagrams
           ref: main
 
-      - name: Generate GitHub App token
+      - name: 🔑 Generate GitHub App token
         id: app-token
         uses: tibdex/github-app-token@v2
         with:
           app_id: ${{ secrets.WIKI_DIAGRAM_APP_ID }}
           private_key: ${{ secrets.WIKI_DIAGRAM_APP_PRIVATE_KEY }}
 
-      - name: Clone homelab-wiki repo
+      - name: 📚 Checkout homelab-wiki repository
         uses: actions/checkout@v4
         with:
           repository: henryhall897/homelab-wiki
@@ -35,16 +36,17 @@ jobs:
           token: ${{ steps.app-token.outputs.token }}
           path: homelab-wiki
 
-      - name: Copy diagrams to homelab-wiki assets folder
+      - name: 🖼️ Copy generated diagrams to homelab-wiki
         run: |
           mkdir -p homelab-wiki/assets/diagrams
-          cp -v assets/diagrams/*.png homelab-wiki/assets/diagrams/
+          echo "Copying generated PNG diagrams..."
+          cp -v assets/diagrams/gen/png/*.png homelab-wiki/assets/diagrams/ || echo "No PNG diagrams found"
 
-      - name: Commit and push changes to homelab-wiki
+      - name: 💾 Commit and push changes to homelab-wiki
         run: |
           cd homelab-wiki
           git config user.name "Wiki Diagram Publisher"
           git config user.email "actions@github.com"
           git add assets/diagrams/
-          git commit -m "Update diagrams from wiki-diagrams" || echo "No changes to commit"
+          git commit -m "📦 Update diagrams from wiki-diagrams [automated]" || echo "No changes to commit"
           git push origin main
